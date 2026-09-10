@@ -119,14 +119,14 @@ export default function Overview() {
           />
           <StatCard
             label="Delayed Trains"
-            value={String(network.data?.total_delayed_trains ?? 0)}
-            subtext={`impact score: ${network.data?.overall_network_impact_score ?? 0}/100`}
+            value={String(network.data?.delayed_trains ?? 0)}
+            subtext={`impact score: ${network.data?.network_impact_score ?? 0}/100`}
             to="/operations/network"
           />
           <StatCard
             label="Active Conflicts"
-            value={String(network.data?.active_conflicts_count ?? 0)}
-            subtext={`${network.data?.congestion_hotspots_count ?? 0} hotspots`}
+            value={String(network.data?.active_conflicts ?? 0)}
+            subtext={`${network.data?.hotspots.length ?? 0} hotspots`}
             to="/operations/network"
           />
           <StatCard

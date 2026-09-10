@@ -263,13 +263,13 @@ export default function Simulator() {
               <div className="flex justify-between text-xs">
                 <span className="text-slate-400">Affected Trains</span>
                 <span className="font-mono text-slate-200">
-                  {impact.data?.total_affected_trains ?? (simDelay >= 15 ? 3 : simDelay >= 8 ? 1 : 0)} trains
+                  {impact.data?.affected_trains.length ?? (simDelay >= 15 ? 3 : simDelay >= 8 ? 1 : 0)} trains
                 </span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-slate-400">Active Conflicts</span>
                 <span className="font-mono text-slate-200">
-                  {impact.data?.active_conflicts?.length ?? (simDelay >= 15 ? 2 : 0)}
+                  {impact.data?.conflicts.length ?? (simDelay >= 15 ? 2 : 0)}
                 </span>
               </div>
             </div>

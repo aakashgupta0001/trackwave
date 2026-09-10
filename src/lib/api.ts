@@ -574,76 +574,112 @@ export function getTrainExplanation(trainNumber: string, stationCode: string) {
 // --- network intelligence (Phase 8) --------------------------------------------------
 
 export type Severity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+export type ConflictType = 'SHARED_SECTION_OVERLAP' | 'INSUFFICIENT_SEPARATION' | 'DOWNSTREAM_DELAY_EXPOSURE'
+export type NetworkAnalysisStatus = 'OK' | 'LIMITED'
+export type ConfidenceLevel = 'HIGH' | 'MEDIUM' | 'LOW'
+
+export type ImpactReason = {
+  type: string
+  description: string
+  confidence: ConfidenceLevel
+}
+
+export type NetworkHotspot = {
+  entity_type: string // 'STATION' | 'SECTION'
+  entity_code: string
+  entity_name: string
+  affected_trains: number
+  conflict_count: number
+  impact_score: number
+  severity: Severity
+}
 
 export type NetworkOverviewResponse = {
-  journey_date: string
-  total_active_trains: number
-  total_delayed_trains: number
-  total_affected_trains: number
-  total_affected_stations: number
-  total_affected_sections: number
-  active_conflicts_count: number
-  congestion_hotspots_count: number
-  overall_network_impact_score: number
-  overall_severity: Severity
   generated_at: string
+  analysis_status: NetworkAnalysisStatus
+  total_trains_monitored: number
+  delayed_trains: number
+  affected_trains: number
+  affected_stations: number
+  affected_sections: number
+  active_conflicts: number
+  hotspots: NetworkHotspot[]
+  network_impact_score: number
+  severity: Severity
+  horizon_minutes: number
+  notes: string[]
+}
+
+export type NetworkConflict = {
+  conflict_type: ConflictType
+  severity: Severity
+  train_a: string
+  train_b: string
+  section_code: string | null
+  station_code: string | null
+  estimated_overlap_minutes: number | null
+  separation_minutes: number | null
+  directional_confidence: ConfidenceLevel
+  reason: ImpactReason
+  predicted_at: string | null
+}
+
+export type AffectedTrain = {
+  source_train_number: string
+  train_number: string
+  train_name: string
+  section_code: string | null
+  station_code: string | null
+  estimated_delay_minutes: number
+  lower_delay_minutes: number | null
+  upper_delay_minutes: number | null
+  propagation_depth: number
+  impact_severity: Severity
+  impact_confidence: ConfidenceLevel
+  reason: ImpactReason
+}
+
+export type StationImpact = {
+  station_code: string
+  station_name: string
+  affected_train_count: number
+  estimated_delay_minutes: number
+  severity: Severity
+  latitude: number | null
+  longitude: number | null
+}
+
+export type SectionImpact = {
+  section_code: string
+  from_station_code: string
+  to_station_code: string
+  affected_trains: number
+  estimated_delay_minutes: number
+  conflict_count: number
+  severity: Severity
 }
 
 export type TrainImpactResponse = {
   train_number: string
-  journey_date: string
-  current_delay_minutes: number
+  train_name: string
+  analysis_status: NetworkAnalysisStatus
+  source_delay_minutes: number
   network_impact_score: number
   severity: Severity
-  directly_affected_trains: number
-  knock_on_affected_trains: number
-  total_affected_trains: number
-  affected_stations: string[]
-  affected_sections: string[]
-  active_conflicts: NetworkConflict[]
+  affected_trains: AffectedTrain[]
+  affected_stations: StationImpact[]
+  affected_sections: SectionImpact[]
+  conflicts: NetworkConflict[]
   generated_at: string
-}
-
-export type NetworkConflict = {
-  id: string
-  section_code: string
-  train_a: string
-  train_b: string
-  conflict_type: string
-  severity: Severity
-  estimated_delay_minutes: number
-  detected_at: string
-  resolved: boolean
-  description?: string | null
-}
-
-export type NetworkHotspot = {
-  identifier: string
-  kind: 'STATION' | 'SECTION'
-  code: string
-  name: string
-  converging_trains_count: number
-  total_delay_minutes: number
-  average_delay_minutes: number
-  congestion_risk: Severity
-}
-
-export type AffectedTrain = {
-  train_number: string
-  train_name: string
-  primary_delay_minutes: number
-  estimated_delay_minutes: number
-  impact_severity: Severity
-  causing_train_number: string | null
-  conflict_section_code: string | null
+  horizon_minutes: number
+  notes: string[]
 }
 
 export type TimelineBucket = {
-  start_time: string
-  end_time: string
-  predicted_conflicts_count: number
-  maximum_severity: Severity
-  affected_trains_count: number
+  timestamp: string
+  affected_trains: number
+  conflicts: number
+  network_impact_score: number
 }
 
 export function getNetworkOverview(journeyDate?: string) {

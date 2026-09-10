@@ -93,12 +93,12 @@ export default function Network() {
               <div className="text-xs uppercase tracking-wider text-slate-500">Network Impact Score</div>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-2xl font-semibold text-white">
-                  {overview.data.overall_network_impact_score}
+                  {overview.data.network_impact_score}
                 </span>
                 <span className="text-xs text-slate-500">/ 100</span>
                 <Badge
-                  label={overview.data.overall_severity}
-                  tone={severityTone(overview.data.overall_severity)}
+                  label={overview.data.severity}
+                  tone={severityTone(overview.data.severity)}
                 />
               </div>
             </div>
@@ -106,9 +106,9 @@ export default function Network() {
             <div className="rounded-lg border border-slate-800 bg-slate-950 p-5">
               <div className="text-xs uppercase tracking-wider text-slate-500">Affected Trains</div>
               <div className="mt-1 text-2xl font-semibold text-white">
-                {overview.data.total_affected_trains}
+                {overview.data.affected_trains}
                 <span className="ml-2 text-xs font-normal text-slate-500">
-                  of {overview.data.total_active_trains} active
+                  of {overview.data.total_trains_monitored} monitored
                 </span>
               </div>
             </div>
@@ -116,21 +116,21 @@ export default function Network() {
             <div className="rounded-lg border border-slate-800 bg-slate-950 p-5">
               <div className="text-xs uppercase tracking-wider text-slate-500">Affected Stations</div>
               <div className="mt-1 text-2xl font-semibold text-white">
-                {overview.data.total_affected_stations}
+                {overview.data.affected_stations}
               </div>
             </div>
 
             <div className="rounded-lg border border-slate-800 bg-slate-950 p-5">
               <div className="text-xs uppercase tracking-wider text-slate-500">Active Conflicts</div>
               <div className="mt-1 text-2xl font-semibold text-white">
-                {overview.data.active_conflicts_count}
+                {overview.data.active_conflicts}
               </div>
             </div>
 
             <div className="rounded-lg border border-slate-800 bg-slate-950 p-5">
               <div className="text-xs uppercase tracking-wider text-slate-500">Congestion Hotspots</div>
               <div className="mt-1 text-2xl font-semibold text-white">
-                {overview.data.congestion_hotspots_count}
+                {overview.data.hotspots.length}
               </div>
             </div>
           </div>
@@ -171,9 +171,9 @@ export default function Network() {
                   <th className="px-3 py-2 font-medium">Train A</th>
                   <th className="px-3 py-2 font-medium">Train B</th>
                   <th className="px-3 py-2 font-medium">Conflict Type</th>
-                  <th className="px-3 py-2 font-medium">Est. Delay</th>
+                  <th className="px-3 py-2 font-medium">Est. Overlap</th>
                   <th className="px-3 py-2 font-medium">Severity</th>
-                  <th className="px-3 py-2 font-medium">Detected</th>
+                  <th className="px-3 py-2 font-medium">Predicted At</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-900">
@@ -184,10 +184,10 @@ export default function Network() {
                     </td>
                   </tr>
                 ) : (
-                  conflicts.data?.items.map((cnf: NetworkConflict) => (
-                    <tr key={cnf.id} className="hover:bg-slate-900/50">
+                  conflicts.data?.items.map((cnf: NetworkConflict, idx: number) => (
+                    <tr key={`${cnf.train_a}-${cnf.train_b}-${cnf.section_code}-${idx}`} className="hover:bg-slate-900/50">
                       <td className="px-3 py-2.5 font-mono font-medium text-slate-200">
-                        {cnf.section_code}
+                        {cnf.section_code ?? '—'}
                       </td>
                       <td className="px-3 py-2.5 font-mono text-slate-300">{cnf.train_a}</td>
                       <td className="px-3 py-2.5 font-mono text-slate-300">{cnf.train_b}</td>
@@ -195,13 +195,13 @@ export default function Network() {
                         {cnf.conflict_type.replace(/_/g, ' ')}
                       </td>
                       <td className="px-3 py-2.5 font-mono text-amber-400">
-                        +{cnf.estimated_delay_minutes} min
+                        {cnf.estimated_overlap_minutes != null ? `${cnf.estimated_overlap_minutes.toFixed(0)} min` : '—'}
                       </td>
                       <td className="px-3 py-2.5">
                         <Badge label={cnf.severity} tone={severityTone(cnf.severity)} />
                       </td>
                       <td className="px-3 py-2.5 font-mono text-slate-500">
-                        {formatIST(cnf.detected_at)}
+                        {cnf.predicted_at ? formatIST(cnf.predicted_at) : '—'}
                       </td>
                     </tr>
                   ))
@@ -220,24 +220,24 @@ export default function Network() {
               <p className="text-xs text-slate-500">No congestion hotspots detected.</p>
             ) : (
               <div className="space-y-2">
-                {hotspots.data?.map((hp) => (
+                {hotspots.data?.map((hp, idx) => (
                   <div
-                    key={hp.identifier}
+                    key={`${hp.entity_type}-${hp.entity_code}-${idx}`}
                     className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-slate-850 bg-slate-900/60 p-3 text-xs"
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-white">{hp.name}</span>
-                        <span className="font-mono text-[10px] text-slate-500">({hp.code})</span>
+                        <span className="font-semibold text-white">{hp.entity_name}</span>
+                        <span className="font-mono text-[10px] text-slate-500">({hp.entity_code})</span>
                         <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">
-                          {hp.kind}
+                          {hp.entity_type}
                         </span>
                       </div>
                       <div className="mt-1 text-slate-400">
-                        {hp.converging_trains_count} converging trains · total delay: {hp.total_delay_minutes} min (avg: {hp.average_delay_minutes.toFixed(1)}m)
+                        {hp.affected_trains} affected trains · {hp.conflict_count} conflicts · impact score {hp.impact_score}/100
                       </div>
                     </div>
-                    <Badge label={hp.congestion_risk} tone={severityTone(hp.congestion_risk)} />
+                    <Badge label={hp.severity} tone={severityTone(hp.severity)} />
                   </div>
                 ))}
               </div>
@@ -258,13 +258,15 @@ export default function Network() {
                   >
                     <div>
                       <div className="font-mono text-xs text-slate-300">
-                        {formatIST(tb.start_time, { hour: '2-digit', minute: '2-digit' })} - {formatIST(tb.end_time, { hour: '2-digit', minute: '2-digit' })}
+                        {formatIST(tb.timestamp, { hour: '2-digit', minute: '2-digit' })}
                       </div>
                       <div className="mt-0.5 text-[11px] text-slate-500">
-                        {tb.predicted_conflicts_count} conflicts · {tb.affected_trains_count} affected trains
+                        {tb.conflicts} conflicts · {tb.affected_trains} affected trains
                       </div>
                     </div>
-                    <Badge label={tb.maximum_severity} tone={severityTone(tb.maximum_severity)} />
+                    <span className="rounded bg-slate-800 px-2 py-0.5 font-mono text-[11px] text-slate-300">
+                      {tb.network_impact_score}/100
+                    </span>
                   </div>
                 ))}
               </div>
