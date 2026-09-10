@@ -20,9 +20,10 @@ data/raw/*
 *.log
 
 # ML artifacts (Phase 6) — generated datasets and trained models are reproducible
-# from scripts; never commit them.
+# from scripts; never commit them. Rooted (leading slash) so this doesn't also
+# match app/models/, which is real application code.
 data/ml/
-models/
+/models/
 .localpg/
 
 # Runtime-generated audit log

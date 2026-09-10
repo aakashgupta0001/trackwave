@@ -1,0 +1,81 @@
+from enum import Enum
+
+
+class StationType(str, Enum):
+    TERMINAL = "TERMINAL"
+    MAJOR = "MAJOR"
+    JUNCTION = "JUNCTION"
+    REGULAR = "REGULAR"
+    HALT = "HALT"
+
+
+class TrainType(str, Enum):
+    RAJDHANI = "RAJDHANI"
+    SHATABDI = "SHATABDI"
+    SUPERFAST = "SUPERFAST"
+    EXPRESS = "EXPRESS"
+
+
+class TrainPriority(str, Enum):
+    HIGH = "HIGH"
+    NORMAL = "NORMAL"
+
+
+class EventType(str, Enum):
+    POSITION_UPDATE = "POSITION_UPDATE"
+    ARRIVAL = "ARRIVAL"
+    DEPARTURE = "DEPARTURE"
+    SIGNAL_HALT = "SIGNAL_HALT"
+    UNSCHEDULED_STOP = "UNSCHEDULED_STOP"
+    SPEED_RESTRICTION = "SPEED_RESTRICTION"
+    CONGESTION = "CONGESTION"
+    MAINTENANCE_BLOCK = "MAINTENANCE_BLOCK"
+    WEATHER_DISRUPTION = "WEATHER_DISRUPTION"
+
+
+class EventSource(str, Enum):
+    SIMULATOR = "SIMULATOR"
+    GPS = "GPS"
+    RTIS = "RTIS"
+    NTES = "NTES"
+    RAILRADAR = "RAILRADAR"
+    MANUAL = "MANUAL"
+    SYSTEM = "SYSTEM"
+
+
+class PredictionMode(str, Enum):
+    ML = "ML"
+    # Phase 5: deterministic section-aware baseline estimate (no ML correction).
+    BASELINE = "BASELINE"
+    # Phase 6: FINAL ETA = BASELINE ETA + ML-predicted residual.
+    ML_RESIDUAL = "ML_RESIDUAL"
+    BASELINE_FALLBACK = "BASELINE_FALLBACK"
+
+
+class AlertType(str, Enum):
+    TRAIN_DELAY = "TRAIN_DELAY"
+    CONGESTION = "CONGESTION"
+    CASCADE_RISK = "CASCADE_RISK"
+    LOW_CONFIDENCE = "LOW_CONFIDENCE"
+    SYSTEM = "SYSTEM"
+    WEATHER = "WEATHER"
+    # --- Phase 8: network intelligence (predictive, not operational) ---
+    NETWORK_CONFLICT = "NETWORK_CONFLICT"
+    DELAY_PROPAGATION = "DELAY_PROPAGATION"
+    HIGH_NETWORK_IMPACT = "HIGH_NETWORK_IMPACT"
+    SECTION_CONGESTION_RISK = "SECTION_CONGESTION_RISK"
+    # --- Phase 10: operational & MLOps system alerts ---
+    DATA_QUALITY_LOW = "DATA_QUALITY_LOW"
+    PROVIDER_DOWN = "PROVIDER_DOWN"
+    STREAM_LAG_HIGH = "STREAM_LAG_HIGH"
+    MODEL_DRIFT = "MODEL_DRIFT"
+    DATA_DRIFT = "DATA_DRIFT"
+    ETA_ERROR_HIGH = "ETA_ERROR_HIGH"
+    UNCERTAINTY_MISCALIBRATED = "UNCERTAINTY_MISCALIBRATED"
+    MODEL_UNAVAILABLE = "MODEL_UNAVAILABLE"
+
+
+class AlertSeverity(str, Enum):
+    INFO = "INFO"
+    WARNING = "WARNING"
+    CRITICAL = "CRITICAL"
