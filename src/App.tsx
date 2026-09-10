@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import AppLayout from './layouts/AppLayout'
+import ProtectedRoute from './components/ProtectedRoute'
 import Simulator from './pages/intelligence/Simulator'
 import Performance from './pages/intelligence/Performance'
 import LiveTrains from './pages/operations/LiveTrains'
@@ -19,14 +20,16 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route element={<AppLayout />}>
-            <Route index element={<Overview />} />
-            <Route path="operations/live-trains" element={<LiveTrains />} />
-            <Route path="operations/stations" element={<Stations />} />
-            <Route path="operations/network" element={<Network />} />
-            <Route path="intelligence/simulator" element={<Simulator />} />
-            <Route path="intelligence/performance" element={<Performance />} />
-            <Route path="settings" element={<Settings />} />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<AppLayout />}>
+              <Route index element={<Overview />} />
+              <Route path="operations/live-trains" element={<LiveTrains />} />
+              <Route path="operations/stations" element={<Stations />} />
+              <Route path="operations/network" element={<Network />} />
+              <Route path="intelligence/simulator" element={<Simulator />} />
+              <Route path="intelligence/performance" element={<Performance />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
           </Route>
         </Routes>
       </PageLoaderProvider>

@@ -9,18 +9,20 @@ function MainContent() {
 
   return (
     <main className="relative min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-      {isLoading ? (
-        <div className="flex h-full min-h-[60vh] items-center justify-center">
+      {/* Overlaid, not swapped in for the Outlet below — swapping would unmount the current
+          page (and all its local state, e.g. an active tab) every time triggerLoader() fires
+          for what's meant to be a brief in-page loading flash, not a real navigation. */}
+      {isLoading && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-slate-900/85 backdrop-blur-sm">
           <PageLoader
             message={currentMessage}
             subtext={currentSubtext}
           />
         </div>
-      ) : (
-        <Suspense fallback={<PageLoader message="Loading Page…" subtext="Initializing railway digital twin module…" />}>
-          <Outlet />
-        </Suspense>
       )}
+      <Suspense fallback={<PageLoader message="Loading Page…" subtext="Initializing railway digital twin module…" />}>
+        <Outlet />
+      </Suspense>
     </main>
   )
 }

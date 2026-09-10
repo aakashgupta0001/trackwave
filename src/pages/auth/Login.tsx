@@ -1,13 +1,15 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { usePageLoader } from '../../context/PageLoaderContext'
 
 export default function Login() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [searchParams] = useSearchParams()
   const { signIn, resetPassword } = useAuth()
   const { triggerLoader } = usePageLoader()
+  const redirectTo = (location.state as { from?: Location })?.from?.pathname ?? '/'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -38,7 +40,7 @@ export default function Login() {
       if (error) {
         setErrorMsg(error.message || 'Failed to sign in. Please check your email and password.')
       } else {
-        navigate('/', { replace: true })
+        navigate(redirectTo, { replace: true })
       }
     } catch (err: any) {
       setErrorMsg(err?.message || 'An unexpected error occurred during sign in.')
