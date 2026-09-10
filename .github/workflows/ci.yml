@@ -1,0 +1,82 @@
+name: RAILCAST CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Backend Lint, Test & Verification
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: railcast_test
+          POSTGRES_USER: railcast
+          POSTGRES_PASSWORD: railcast_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install flake8 pytest-cov
+
+      - name: Lint & Code Style Check
+        run: |
+          # Stop build if there are Python syntax errors or undefined names
+          flake8 backend/app --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Apply Database Migrations & Seed Sample Network
+        env:
+          DATABASE_URL: postgresql+psycopg://railcast:railcast_password@localhost:5432/railcast_test
+          REDIS_URL: redis://localhost:6379/0
+          PYTHONPATH: backend
+        run: |
+          cd backend
+          alembic upgrade head
+          python -m scripts.seed
+
+      - name: Run Test Suite with Pytest
+        env:
+          DATABASE_URL: postgresql+psycopg://railcast:railcast_password@localhost:5432/railcast_test
+          REDIS_URL: redis://localhost:6379/0
+          PYTHONPATH: backend
+        run: |
+          cd backend
+          pytest -v
+
+      - name: Verify Docker Container Build
+        run: |
+          cd backend
+          docker build -t railcast-backend:ci .

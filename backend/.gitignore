@@ -1,0 +1,29 @@
+# Environment
+.env
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# ML / data artifacts
+mlruns/
+data/processed/*
+data/raw/*
+!data/processed/.gitkeep
+!data/raw/.gitkeep
+
+# Logs
+*.log
+
+# ML artifacts (Phase 6) — generated datasets and trained models are reproducible
+# from scripts; never commit them.
+data/ml/
+models/
+.localpg/
+
+# Runtime-generated audit log
+data/audit_log.jsonl

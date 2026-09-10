@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------------------
+# RAILCAST backend dependencies
+#
+# Phase 1 installs only the packages needed to run the API skeleton against
+# PostgreSQL + Redis. Later phases (ML training, SHAP explainability, MLflow
+# tracking, event simulation) add their own packages when that work starts —
+# see the commented groups below, which stay here as a roadmap.
+# ---------------------------------------------------------------------------
+
+# --- Web framework ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.5
+pydantic-settings==2.7.1
+
+# --- Database ---
+sqlalchemy==2.0.36
+alembic==1.14.1
+psycopg[binary]==3.2.4
+
+# --- Cache / event processing ---
+redis==5.2.1
+
+# --- Testing ---
+pytest==8.3.4
+pytest-asyncio==0.25.2
+httpx==0.28.1
+
+# ---------------------------------------------------------------------------
+# Added in Phase 6 (ML residual ETA model):
+pandas==2.2.3               # dataset building / feature engineering
+numpy==2.2.1                # ML pipeline
+xgboost==2.1.3              # residual model
+pyarrow==19.0.0             # Parquet dataset serialization
+# ---------------------------------------------------------------------------
+# Added in later phases (uncomment when that phase begins):
+#
+# scikit-learn==1.6.0        # Phase 7 evaluation utilities
+# shap==0.46.0               # Phase 9 explainability
+# mlflow==2.19.0             # Phase 6-7 experiment tracking
+# ---------------------------------------------------------------------------
